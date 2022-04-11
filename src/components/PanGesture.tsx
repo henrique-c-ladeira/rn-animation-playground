@@ -11,7 +11,7 @@ import Animated, {
   withDecay,
 } from 'react-native-reanimated';
 import { Card, CARD_HEIGHT, CARD_WIDTH } from './Card';
-import { clamp } from 'react-native-redash';
+import { clamp, withBouncing } from 'react-native-redash';
 
 type PanGestureProps = {
   width: number;
@@ -40,14 +40,20 @@ export const PanGesture: React.FC<PanGestureProps> = ({ width, height }) => {
       translateY.value = clamp(context.offsetY + event.translationY, 0, boundY);
     },
     onEnd: event => {
-      translateX.value = withDecay({
-        velocity: event.velocityX,
-        clamp: [0, boundX],
-      });
-      translateY.value = withDecay({
-        velocity: event.velocityY,
-        clamp: [0, boundY],
-      });
+      translateX.value = withBouncing(
+        withDecay({
+          velocity: event.velocityX,
+        }),
+        0,
+        boundX,
+      );
+      translateY.value = withBouncing(
+        withDecay({
+          velocity: event.velocityY,
+        }),
+        0,
+        boundY,
+      );
     },
   });
   const style = useAnimatedStyle(() => ({
